@@ -1,0 +1,47 @@
+
+Implementation:
+* Viewports (with lists of objects to be rendered)
+* Port to windows
+* Option to reload the UI init file
+
+
+Data:
+* Data source
+ - basic model format
+ - Text loader
+
+
+
+Layout:
+* Nested layout (containers with objects)
+* Anchors
+* Vertical and horizontal layouts (panels)
+
+
+
+
+Implement other UI components:
+* Button
+* Checkbox
+* Textbox  (text field)
+* Scrollable field for displaying text and log output
+* Slider
+* Arrows and lines
+* Images
+
+
+When layout engine and ui components have been implemented,
+begin implementation of basic dialogs (in lua):
+* LoadObjectFile
+* FileEditor
+
+
+Visual:
+* Transparency
+
+
+Misc.:
+* Load layout from XML files
+* Give windows ids
+* Ensure loading of fonts works on windows
+
