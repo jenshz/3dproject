@@ -33,7 +33,7 @@ GLvoid glPrint(const char *fmt, ... )
     return;
 
   va_start( ap, fmt );
-  vsprintf( text, fmt, ap );
+  vsnprintf( text, 256, fmt, ap );
   va_end( ap );
 
   glPushAttrib(GL_LIST_BIT);

@@ -1,21 +1,15 @@
 cmake_minimum_required(VERSION 2.8)
 project(PIPE)
 
-find_package(Lua REQUIRED)
+find_package(Lua51 REQUIRED)
 find_package(Luabind REQUIRED)
 
 include_directories(
-	${LUA_INCLUDE_DIR}
+	/usr/include/lua5.1
 	${LUABIND_INCLUDE_DIR}
+	"${PIPE_SOURCE_DIR}/include"
+	"${PIPE_SOURCE_DIR}/include/linux"
 )
-
-# System wide
-include_directories(${PIPE_SOURCE_DIR}/include)
-
-# Platform specific
-if(${UNIX})
-  include_directories(${PIPE_SOURCE_DIR}/include/linux)
-endif(${UNIX})
 
 add_subdirectory(ui)
 add_subdirectory(engine)

@@ -1,5 +1,5 @@
-#include <GL/gl.h>
 #include <vector>
+#include <iostream>
 
 #include "platform.hh"
 #include "gl.hh"
@@ -7,13 +7,19 @@
 
 std::vector<Shape*> objects;
 
+namespace app {
+	int width, height;
+	int oldWidth = 0, oldHeight = 0;
+	int oldX, oldY;
+	bool fullScreen = false;
+}
+
 void initGL()
 {
 	glClearColor (0., 0., 0., 0.);
 	glShadeModel (GL_FLAT);
-  platform_buildFont();
-
-  ui.init();
+	platform_buildFont();
+	ui.init();
 }
 
 
@@ -21,6 +27,8 @@ void reshape (int w, int h)
 {
 	glViewport (0, 0, (GLsizei) w, (GLsizei) h);
   ui.reshape(w, h);
+  app::width = w;
+  app::height = h;
 }
 
 void display (void) {
@@ -67,3 +75,40 @@ void mouse(int button, int state, int x, int y)
   }
 }
 
+void keyboard(unsigned char key, int x, int y)
+{
+	ui.keyDown(key);
+}
+
+int Screen::getWidth()
+{
+	return app::width;
+}
+
+int Screen::getHeight()
+{
+	return app::height;
+}
+
+void Screen::setSize(int w, int h)
+{
+	glutReshapeWindow(w, h);
+}
+
+void Screen::toggleFullScreen()
+{
+	using namespace app;
+	if (fullScreen) {
+		glutPositionWindow(oldX, oldY);
+		glutReshapeWindow(oldWidth, oldHeight);
+	} else {
+		oldX = glutGet(GLUT_WINDOW_X);
+		oldY = glutGet(GLUT_WINDOW_Y);
+                    
+		oldWidth = width;
+		oldHeight = height;
+		glutFullScreen();
+	}
+
+	fullScreen = !fullScreen;
+}

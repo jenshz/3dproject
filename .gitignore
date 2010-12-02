@@ -3,4 +3,8 @@ Makefile
 cmake_install.cmake
 CMakeCache.txt
 pipe
-
+Debug
+Release
+dist
+dist.zip
+*vcxproj*

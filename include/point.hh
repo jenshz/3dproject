@@ -8,9 +8,11 @@ struct Point2D {
   Point2D() : x(0), y(0) {}
   Point2D(double mx, double my) : x(mx), y(my) {}
 
-  Point2D operator=(const Point2D &p) {
+  Point2D& operator=(const Point2D &p) {
     x = p.x;
     y = p.y;
+
+	return *this;
   }
 
   Point2D operator+(const Point2D &p) {

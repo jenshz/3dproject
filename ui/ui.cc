@@ -15,7 +15,7 @@ UI ui;
 extern lua_State *lua;
 
 Window::Window(int mx, int my, std::string mtitle)
-  : x(mx), y(my), w(10), h(10), title(mtitle), border(true), draggable(true)
+  : Container(mx, my, 10, 10), title(mtitle), border(true), draggable(true)
 {
   ui.windows.push_back(this);
 }
@@ -40,8 +40,12 @@ void Window::draw()
   glColor3fv(ui_text);
   glRasterPos2i(x+2, y+16);
   glPrint("%s", title.c_str());
+  Container::draw(0, 0);
 }
 
+void Window::layout()
+{
+}
 
 // *** UI functions ***
 
@@ -52,6 +56,8 @@ void UI::init()
   if (error) {
     std::cerr << std::endl << lua_tostring(lua, -1) << std::endl;
   }
+
+  // Lets create a test window
 }
 
 
@@ -70,38 +76,56 @@ void UI::motion(int x, int y)
     }
 
     glutPostRedisplay();
+  } else if (focused) {
+	  // TODO: Do this right some time.
+	  /*if (dx > 2 || dy > 2 || dy < -2 || dx < -2) {
+		  ui.setFocus(0);
+	      glutPostRedisplay();
+	  } */
   }
 }
 
 
-void UI::mouseDown(int button, int x, int y)
+void UI::mouseDown(int button, int cx, int cy)
 {
-  for (std::vector<Window*>::reverse_iterator it = windows.rbegin(); it != windows.rend(); it++) {
-    if (x >= (*it)->x && (x <= (*it)->x + (*it)->w) && y >= (*it)->y && (y <= (*it)->y + (*it)->h)) {
-      if ((*it)->draggable) {
-        drag = *it;
-        dx = x - drag->x;
-        dy = y - drag->y;
+  for (std::list<Window*>::iterator it = windows.begin(); it != windows.end(); it++) {
+	Window *w = *it;
+    if (w->visible && cx >= w->x && (cx < w->x + w->w) && cy >= w->y && (cy < w->y + w->h)) {
+	  // Bring window to front.
+	  windows.erase(it);
+	  windows.push_front(w);
+
+	  if (w->onClick(cx, cy)) {
+	      glutPostRedisplay();
+		  return;
+	  }
+
+	  // Window is draggable
+      if (w->draggable) {
+        drag = w;
+        dx = cx - drag->x;
+        dy = cy - drag->y;
       }
 
-      try {
-        if ((*it)->onClick && luabind::type((*it)->onClick) == LUA_TFUNCTION) {
-          (*it)->onClick(boost::ref(**it));
-        }
-      } catch (const std::exception &e) {
-        std::cerr << e.what() << std::endl;
-      }
-      
       glutPostRedisplay();
       break;
     }
   }
+  ui.setFocus(0);
 }
 
 
 void UI::mouseUp(int button, int x, int y)
 {
 	drag = 0;
+	if (focused) {
+		ClickListener *cl = dynamic_cast<ClickListener*>(focused);
+		if (cl) {
+			cl->click();
+			focused = 0;
+			glutPostRedisplay();
+		}
+	}
 }
 
 
@@ -114,24 +138,43 @@ void UI::reshape(int w, int h)
 
 void UI::draw()
 {
-	glMatrixMode(GL_PROJECTION);
+  glMatrixMode(GL_PROJECTION);
   glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, w, h, 0, -1, 1);
-	glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity();
+  glOrtho(0, w, h, 0, -1, 1);
+  glMatrixMode (GL_MODELVIEW);
   glPushMatrix();
-	glLoadIdentity();
+  glLoadIdentity();
 
   glColor3f(0., 1., 0.);
 
-  for (std::vector<Window*>::iterator it = windows.begin(); it != windows.end(); it++) {
-    (*it)->draw();
+  for (std::list<Window*>::reverse_iterator it = windows.rbegin(); it != windows.rend(); it++) {
+	  if ((*it)->visible)
+		(*it)->draw();
   }
 
-	glMatrixMode (GL_PROJECTION);
+  glMatrixMode (GL_PROJECTION);
   glPopMatrix();
 
-	glMatrixMode (GL_MODELVIEW);
+  glMatrixMode (GL_MODELVIEW);
   glPopMatrix();
 }
 
+bool UI::hasFocus(Component *comp)
+{
+	return (focused == comp);
+}
+
+void UI::setFocus(Component *comp)
+{
+	focused = comp;
+}
+
+void UI::keyDown(int key)
+{
+	KeyListener *kl = dynamic_cast<KeyListener*>(focused);
+	if (kl) {
+		kl->keyPressed(key);
+	}
+	glutPostRedisplay();
+}

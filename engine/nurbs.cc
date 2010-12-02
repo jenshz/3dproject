@@ -1,14 +1,17 @@
-#include <GL/glut.h>
-#include "nurbs.hh"
 #include "gl.hh"
+#include "nurbs.hh"
+
+#include <iostream>
 
 Nurbs::Nurbs()
 {
   objects.push_back(this);
 }
 
-Point2D deBoor(int k,int degree, int i, double x, const double* knots, const Point2D *ctrlPoints)
+Point2D deBoor(int k,int degree, int i, double x, std::vector<double> &knots, std::vector<Point2D> &ctrlPoints)
 {
+	if ((i < 0) || (i >= ctrlPoints.size()))
+		return Point2D();
 	if( k == 0) {
 		return ctrlPoints[i];
 	} else
@@ -18,9 +21,9 @@ Point2D deBoor(int k,int degree, int i, double x, const double* knots, const Poi
 	}
 }
 
-static int WhichInterval(double x, const double *knot, int ti)
+static int WhichInterval(double x, std::vector<double> &knot, int ti)
 {
-  for(int i=1;i<ti-1;i++) {
+  for(unsigned int i=1;i<knot.size()-1;i++) {
     if(x<knot[i])
       return(i-1);
     else if(x == knot[ti-1])
@@ -52,27 +55,27 @@ static int WhichInterval(double x, const double *knot, int ti)
 void Nurbs::draw()
 {
   int deg = 4;
+ 
+  std::vector<Point2D> p(shapes.size()+deg*2-2);
 
-  Point2D p[shapes.size()+deg*2-2];
-
-  for (int i = 0; i < shapes.size(); i++) {
+  for (unsigned int i = 0; i < shapes.size(); i++) {
     p[deg+i-1].x = shapes[i]->x;
     p[deg+i-1].y = shapes[i]->y;
   }
 
-  double knots[shapes.size() + deg*2-1];
+  std::vector<double> knots(shapes.size() + deg*2-1);
 
   for (int i = 0; i < deg-1; i++) {
     p[deg-2-i] = p[3];
     p[deg+shapes.size()+i-1] = p[deg+shapes.size()+i-2];
   }
 
-  for (int i = 0; i < deg; i++) {
+  for (int i = 0; i < deg-1; i++) {
     knots[i] = 0;
     knots[deg+shapes.size()+i] = shapes.size();
   }
 
-  for (int i = 0; i < shapes.size(); i++) {
+  for (unsigned int i = 0; i < shapes.size(); i++) {
     knots[deg+i] = i;
   }
 
@@ -82,7 +85,7 @@ void Nurbs::draw()
   for (int i = 0; i <= cnt; i++) {
     float t = (double)i/cnt * shapes.size();
 
-    Point2D now = deBoor(deg, deg, WhichInterval(t, knots, shapes.size() + deg*2-2), t, knots, p);
+	Point2D now = deBoor(deg, deg, WhichInterval(t, knots, shapes.size() + deg*2-2), t, knots, p);
 
     if (i > 0) {
       glBegin(GL_LINES);
@@ -93,6 +96,7 @@ void Nurbs::draw()
 
     last = now;
   }
+
 }
 
 void Nurbs::addPoint(Point2D *w)

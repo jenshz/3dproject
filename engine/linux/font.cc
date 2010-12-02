@@ -1,29 +1,8 @@
+#include <GL/gl.h>
+#include <GL/glx.h>     // Header file fot the glx libraries.
 #include <stdexcept>
 
-#include "platform.hh"
-#include "font.hh"
-#include "gl.hh"
-
-void platform_start(int argc, char*argv[])
-{
-	glutInit (&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_SINGLE | GLUT_DOUBLE);
-	glutInitWindowSize (640, 480);
-	glutInitWindowPosition (100, 100);
-	glutCreateWindow ("Ortho test");
-
-	glutDisplayFunc (display);
-	glutReshapeFunc (reshape);
-  glutMouseFunc(mouse);
-  glutMotionFunc(motion);
-
-  initGL();
-
-	glutMainLoop ();
-
-}
-
-#include <GL/glx.h>     // Header file fot the glx libraries.
+extern GLuint font_base;
 
 /* function to build our font list */
 void platform_buildFont()
@@ -56,5 +35,3 @@ void platform_buildFont()
 
   return;
 }
-
-
