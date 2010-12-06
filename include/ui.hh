@@ -26,7 +26,9 @@ public:
   Window(int mx, int my, std::string mtitle);
 
   void draw();
-  void layout();
+  void pack();
+
+  virtual void add(Component *comp);
 };
 
 class UI {
@@ -53,9 +55,9 @@ public:
   void draw();
 
   // Mouse
-  void motion(int x, int y);
-  void mouseDown(int button, int x, int y);
-  void mouseUp(int button, int x, int y);
+  bool motion(int x, int y);
+  bool mouseDown(int button, int x, int y);
+  bool mouseUp(int button, int x, int y);
 
   // Keyboard
   void keyDown(int key);

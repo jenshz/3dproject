@@ -4,8 +4,7 @@
 #include "platform.hh"
 #include "gl.hh"
 #include "ui.hh"
-
-std::vector<Shape*> objects;
+#include "engine.hh"
 
 namespace app {
 	int width, height;
@@ -26,6 +25,10 @@ void initGL()
 void reshape (int w, int h)
 {
 	glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+  
+	glMatrixMode(GL_PROJECTION);
+	gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);
+
   ui.reshape(w, h);
   app::width = w;
   app::height = h;
@@ -36,41 +39,45 @@ void display (void) {
 
 	glColor3f (1.,1.,1.);
 
+	glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity();
+
+  scene.draw();
+
 	glMatrixMode(GL_PROJECTION);
   glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, ui.w, ui.h, 0, -1, 1);
+  glOrtho(0, ui.w, ui.h, 0, -1, 1);
 
 	glMatrixMode (GL_MODELVIEW);
-
-  for (std::vector<Shape*>::iterator it = objects.begin(); it != objects.end(); it++) {
-    (*it)->draw();
-  }
+  glLoadIdentity();
+  ui.draw();
 
 	glMatrixMode (GL_PROJECTION);
   glPopMatrix();
-
-	glMatrixMode (GL_MODELVIEW);
-
-
-  ui.draw();
 
   glutSwapBuffers();
 }
 
 void motion(int x, int y)
 {
-  ui.motion(x,y);
+  if (!ui.motion(x,y)) {
+    scene.motion(x, y);
+  }
 }
 
 void mouse(int button, int state, int x, int y)
 {
   switch(state) {
   case GLUT_UP:
-    ui.mouseUp(button, x, y);
+    if (!ui.mouseUp(button, x, y)) {
+      scene.mouseUp(button, x, y);
+    }
     break;
   case GLUT_DOWN:
-    ui.mouseDown(button, x, y);
+    if (!ui.mouseDown(button, x, y)) {
+      scene.mouseDown(button, x, y);
+    }
     break;
   }
 }

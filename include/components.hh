@@ -45,8 +45,12 @@ public:
 	{
 	}
 
+	Container()
+		: Component(0, 0, 0, 0)
+	{}
+
 	virtual void add(Component *comp);
-	virtual void layout() = 0;
+	virtual void layout();
 	virtual void draw(int px, int py);
 	virtual bool onClick(int cx, int cy);
 };
@@ -90,7 +94,7 @@ public:
 
 class Label : public Component {
 public:
-	Label(int x, int y, const std::string &text);
+	Label(const std::string &text, int w);
 
 	virtual void draw(int px, int py);
 
@@ -100,6 +104,7 @@ public:
 
 class Button : public Component, public ClickListener {
 public:
+	Button(const std::string &text, int width);
 	Button(int x, int y, int w, int h, const std::string &text);
 
 	virtual void draw(int px, int py);
@@ -110,6 +115,7 @@ public:
 
 class TextBox : public Component, public KeyListener {
 public:
+	TextBox(const std::string &mtext, int width);
 	TextBox(int mx, int my, int w, int h, const std::string &mtext);
 
 	const std::string &getText();

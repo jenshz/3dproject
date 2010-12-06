@@ -5,10 +5,10 @@
 
 // *** Window functions ***
 
-const float ui_text[] = { 0.0, 0.0, 0.8 };
-const float ui_front[] = { 0.8, 0.8, 0.8 };
-const float ui_border1[] = { 1.0, 1.0, 1.0 };
-const float ui_border2[] = { 0.2, 0.2, 0.2 };
+static const float ui_text[] = { 0.0, 0.0, 0.8 };
+static const float ui_front[] = { 0.8, 0.8, 0.8 };
+static const float ui_border1[] = { 1.0, 1.0, 1.0 };
+static const float ui_border2[] = { 0.2, 0.2, 0.2 };
 
 UI ui;
 
@@ -43,8 +43,27 @@ void Window::draw()
   Container::draw(0, 0);
 }
 
-void Window::layout()
+void Window::add(Component *c)
 {
+  c->x += 5;
+  c->y += 20;
+  Container::add(c);
+}
+
+void Window::pack()
+{
+  this->layout();
+
+  // Determine bounding box
+  w = 10;
+  h = 20;
+  for (std::vector<Component*>::iterator it = children.begin(); it != children.end(); it++) {
+    int cw = (*it)->w + (*it)->x + 5;
+    int ch = (*it)->h + (*it)->y + 5;
+
+    w = cw > w ? cw : w;
+    h = ch > h ? ch : h;
+  }
 }
 
 // *** UI functions ***
@@ -61,7 +80,7 @@ void UI::init()
 }
 
 
-void UI::motion(int x, int y)
+bool UI::motion(int x, int y)
 {
   if (drag) {
     drag->x = x - dx;
@@ -76,31 +95,34 @@ void UI::motion(int x, int y)
     }
 
     glutPostRedisplay();
+    return true;
   } else if (focused) {
 	  // TODO: Do this right some time.
 	  /*if (dx > 2 || dy > 2 || dy < -2 || dx < -2) {
 		  ui.setFocus(0);
 	      glutPostRedisplay();
 	  } */
+  } else {
+    return false;
   }
 }
 
 
-void UI::mouseDown(int button, int cx, int cy)
+bool UI::mouseDown(int button, int cx, int cy)
 {
   for (std::list<Window*>::iterator it = windows.begin(); it != windows.end(); it++) {
-	Window *w = *it;
+    Window *w = *it;
     if (w->visible && cx >= w->x && (cx < w->x + w->w) && cy >= w->y && (cy < w->y + w->h)) {
-	  // Bring window to front.
-	  windows.erase(it);
-	  windows.push_front(w);
+      // Bring window to front.
+      windows.erase(it);
+      windows.push_front(w);
 
-	  if (w->onClick(cx, cy)) {
-	      glutPostRedisplay();
-		  return;
-	  }
+      if (w->onClick(cx, cy)) {
+        glutPostRedisplay();
+        return true;
+      }
 
-	  // Window is draggable
+      // Window is draggable
       if (w->draggable) {
         drag = w;
         dx = cx - drag->x;
@@ -108,15 +130,20 @@ void UI::mouseDown(int button, int cx, int cy)
       }
 
       glutPostRedisplay();
-      break;
+      return true;
     }
   }
   ui.setFocus(0);
+  return false;
 }
 
 
-void UI::mouseUp(int button, int x, int y)
+bool UI::mouseUp(int button, int x, int y)
 {
+  if (!drag && !focused) {
+    return false;
+  }
+
 	drag = 0;
 	if (focused) {
 		ClickListener *cl = dynamic_cast<ClickListener*>(focused);
@@ -146,11 +173,9 @@ void UI::draw()
   glPushMatrix();
   glLoadIdentity();
 
-  glColor3f(0., 1., 0.);
-
   for (std::list<Window*>::reverse_iterator it = windows.rbegin(); it != windows.rend(); it++) {
 	  if ((*it)->visible)
-		(*it)->draw();
+      (*it)->draw();
   }
 
   glMatrixMode (GL_PROJECTION);

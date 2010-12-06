@@ -5,18 +5,18 @@
 
 Nurbs::Nurbs()
 {
-  objects.push_back(this);
+  //  objects.push_back(this);
 }
 
-Point2D deBoor(int k,int degree, int i, double x, std::vector<double> &knots, std::vector<Point2D> &ctrlPoints)
+Vector2f deBoor(int k,int degree, int i, double x, std::vector<double> &knots, std::vector<Vector2f> &ctrlPoints)
 {
 	if ((i < 0) || (i >= ctrlPoints.size()))
-		return Point2D();
+		return Vector2f();
 	if( k == 0) {
 		return ctrlPoints[i];
 	} else
 	{
-		double alpha = (x-knots[i])/(knots[i+degree+1-k]-knots[i]);
+		float alpha = (x-knots[i])/(knots[i+degree+1-k]-knots[i]);
 		return (deBoor(k-1,degree, i-1, x, knots, ctrlPoints)*(1-alpha )+deBoor(k-1,degree, i, x, knots, ctrlPoints)*alpha);
 	}
 }
@@ -41,12 +41,12 @@ static int WhichInterval(double x, std::vector<double> &knot, int ti)
     glBegin(GL_LINES);
     glVertex2f((1-t0)*(1-t0)*(1-t0)*p[0].x + 3*(1-t0)*(1-t0)*t0*p[1].x + 3*(1-t0)*t0*t0*p[2].x 
                + t0*t0*t0*p[3].x,
-               (1-t0)*(1-t0)*(1-t0)*p[0].y + 3*(1-t0)*(1-t0)*t0*p[1].y + 3*(1-t0)*t0*t0*p[2].y 
-               + t0*t0*t0*p[3].y);
+               (1-t0)*(1-t0)*(1-t0)*p[0].v[1] + 3*(1-t0)*(1-t0)*t0*p[1].v[1] + 3*(1-t0)*t0*t0*p[2].v[1] 
+               + t0*t0*t0*p[3].v[1]);
     glVertex2f((1-t1)*(1-t1)*(1-t1)*p[0].x + 3*(1-t1)*(1-t1)*t1*p[1].x + 3*(1-t1)*t1*t1*p[2].x 
                + t1*t1*t1*p[3].x,
-               (1-t1)*(1-t1)*(1-t1)*p[0].y + 3*(1-t1)*(1-t1)*t1*p[1].y + 3*(1-t1)*t1*t1*p[2].y 
-               + t1*t1*t1*p[3].y);
+               (1-t1)*(1-t1)*(1-t1)*p[0].v[1] + 3*(1-t1)*(1-t1)*t1*p[1].v[1] + 3*(1-t1)*t1*t1*p[2].v[1] 
+               + t1*t1*t1*p[3].v[1]);
     glEnd();
   }
   */
@@ -56,11 +56,11 @@ void Nurbs::draw()
 {
   int deg = 4;
  
-  std::vector<Point2D> p(shapes.size()+deg*2-2);
+  std::vector<Vector2f> p(shapes.size()+deg*2-2);
 
   for (unsigned int i = 0; i < shapes.size(); i++) {
-    p[deg+i-1].x = shapes[i]->x;
-    p[deg+i-1].y = shapes[i]->y;
+    p[deg+i-1].v[0] = shapes[i]->v[0];
+    p[deg+i-1].v[1] = shapes[i]->v[1];
   }
 
   std::vector<double> knots(shapes.size() + deg*2-1);
@@ -79,18 +79,18 @@ void Nurbs::draw()
     knots[deg+i] = i;
   }
 
-  Point2D last;
+  Vector2f last;
   int cnt = 100;
 
   for (int i = 0; i <= cnt; i++) {
     float t = (double)i/cnt * shapes.size();
 
-	Point2D now = deBoor(deg, deg, WhichInterval(t, knots, shapes.size() + deg*2-2), t, knots, p);
+	Vector2f now = deBoor(deg, deg, WhichInterval(t, knots, shapes.size() + deg*2-2), t, knots, p);
 
     if (i > 0) {
       glBegin(GL_LINES);
-      glVertex2d(last.x, last.y);
-      glVertex2d(now.x, now.y);
+      glVertex2d(last.v[0], last.v[1]);
+      glVertex2d(now.v[0], now.v[1]);
       glEnd();
     }
 
@@ -99,7 +99,7 @@ void Nurbs::draw()
 
 }
 
-void Nurbs::addPoint(Point2D *w)
+void Nurbs::addPoint(Point2f *w)
 {
   shapes.push_back(w);
 }

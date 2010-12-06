@@ -2,18 +2,17 @@
 #define _NURBS_HH_
 
 #include <vector>
-#include "draw.hh"
-#include "point.hh"
+#include "vector.hh"
 
 class Nurbs : public Shape
 {
 private:
-  std::vector<Point2D*> shapes;
+  std::vector<Point2f*> shapes;
 
 public:
   Nurbs();
 
-  void addPoint(Point2D *p);
+  void addPoint(Point2f *p);
 
   void draw();
 };

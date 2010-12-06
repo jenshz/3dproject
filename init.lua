@@ -1,80 +1,48 @@
-sel = {}
-
-myw = Window(200, 250, "Inspector")
-myw.width = 160
-myw.height = 100
-
-tbx = TextBox(5, 25, 150, 20, "")
-tby = TextBox(5, 48, 150, 20, "")
-
-button = Button(55, 71, 100, 20, "Update")
-button.onClick = function(self)
-   p = points[sel.title]
-   sel.x = tonumber(tbx.text)
-   sel.y = tonumber(tby.text)
-   sel:onMove()
-end
-
-myw:add(tbx)
-myw:add(tby)
-myw:add(button)
-
-
 windows = {}
 
-points = {}
+main_win = Window(0, 0, "Main Menu")
+main_win.border = false
+main_win.draggable = false
 
-nurb = Nurbs()
+close_but = Button("Quit", 100)
+close_but.onClick = function(self)
+  System.exit(0)
+end
 
-count = 0
+windows[main_win] = true
+
+main_win:add(close_but)
+main_win:pack()
 
 
--- Nurbs test:
+-- Game
 
-function pointMove(self)
-   if sel.title ~= self.title then
-     sel = self
-     myw.title = "Inspecting: " .. sel.title
+scene = Scene.get()
+
+camera = scene:getCamera()
+camera.rotX = 30
+camera.rotY = -30
+
+lsel = {}
+
+function onClick(sel)
+   lsel.color = Point3f(0.3, 0.3, 0.3)
+   lsel = sel
+   sel.color = Point3f(1,0,0)
+end
+
+scene.onDeselect = function()
+   lsel.color = Point3f(0.3, 0.3, 0.3)
+end
+
+for i=-1,1 do
+   for j=-1,1 do
+      obj = createQuad()
+      obj.pos = Point3f(i*2.1,-1,j*2.1)
+      obj.color = Point3f(0.3, 0.3, 0.3)
+      obj.id = (i + 1) + (j + 1)*3 + 1
+      obj.onClick = onClick
+      scene:add(obj)
    end
-   p = points[self.title]
-   p.x = self.x + self.width / 2
-   p.y = self.y + self.height / 2
-
-   tbx.text = "" .. self.x
-   tby.text = "" .. self.y
 end
 
-for v=1,5 do
-   count = count + 1
-   i = count
-   p = Point2D(50 + i * 100, 100)
-   w = Window(50 + i * 100 - 5, 100 - 5, ""..i)
-   w.onMove = pointMove
-   windows[""..i] = w
-   points[""..i] = p
-   nurb:addPoint(p)
-end
-
-control = Window(30, 250, "Controls")
-control.width = 150
-control.height = 100
-
-create_but = Button(10, 25, 100, 20, "Add point");
-create_but.onClick = function(self)
-   count = count + 1
-   i = count
-   p = Point2D(550, 200)
-   w = Window(550 - 5, 200 - 5, ""..i)
-   w.onMove = pointMove
-   windows[""..i] = w
-   points[""..i] = p
-   nurb:addPoint(p)
-end
-
-exit_app = Button(10, 48, 100, 20, "Exit");
-exit_app.onClick = function(self)
-   System.exit(0)
-end
-
-control:add(create_but)
-control:add(exit_app)

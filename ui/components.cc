@@ -8,9 +8,16 @@
 #include "gl.hh"
 #include "font.hh"
 
+#define PADDING 2
+
+static const float ui_text[] = { 0.0, 0.0, 0.8 };
+static const float ui_front[] = { 0.7, 0.7, 0.7 };
+static const float ui_pressed[] = { 0.8, 0.8, 0.8 };
+static const float ui_border1[] = { 1.0, 1.0, 1.0 };
+static const float ui_border2[] = { 0.2, 0.2, 0.2 };
 
 Component::~Component() {
-std::cerr << "DEBUG: " << this << " destroyed" << std::endl;
+  std::cerr << "DEBUG: " << this << " destroyed" << std::endl;
 }
 
 void Container::add(Component *comp)
@@ -55,36 +62,79 @@ bool Container::onClick(int cx, int cy)
 	return false;
 }
 
+void Container::layout()
+{
+  // Just keep the components in their designed position
+  // But update width and heights of child containers
+  for (std::vector<Component*>::iterator it = children.begin(); it != children.end(); it++) {
+    Container *ct = dynamic_cast<Container*>(*it);
+    if (ct) {
+      ct->layout();
+    }
+  }
+}
+
 void Panel::layout()
 {
+  Container::layout();
 }
 
 void VerticalPanel::layout()
 {
-	// TODO
+  // First layout all sub-containers (this will update their size)
+  // At the same time update the width and height
+  h = 0;
+  w = 0;
+  for (std::vector<Component*>::iterator it = children.begin(); it != children.end(); it++) {
+    Container *ct = dynamic_cast<Container*>(*it);
+    if (ct) {
+      ct->layout();
+    }
+    (*it)->y = h;
+    (*it)->x = 0;
+    h += (*it)->h + PADDING * 2;
+    w = w > (*it)->w ? w : (*it)->w;
+  }
 }
 
 void HorizontalPanel::layout()
 {
-	// TODO
+  // First layout all sub-containers (this will update their size)
+  // At the same time update the width and height
+  h = 0;
+  w = 0;
+  for (std::vector<Component*>::iterator it = children.begin(); it != children.end(); it++) {
+    Container *ct = dynamic_cast<Container*>(*it);
+    if (ct) {
+      ct->layout();
+    }
+    (*it)->y = 0;
+    (*it)->x = w;
+    w += (*it)->w + PADDING * 2;
+    h = h > (*it)->h ? h : (*it)->h;
+  }
 }
 
-Label::Label(int rx, int ry, const std::string &text)
-	: Component(rx, ry, 0, 0), caption(text)
+Label::Label(const std::string &text, int w)
+	: Component(0, 0, w, 16), caption(text)
 {
 }
 
 void Label::draw(int px, int py)
 {
-  glColor3f(1., 0, 0);
+  glColor3f(0, 0, 0);
   glRasterPos2i(px + x, py + y + 14);
   glPrint("%s", caption.c_str());
+}
+
+Button::Button(const std::string &text, int width)
+	: Component(0,0,width,20), caption(text)
+{
 }
 
 Button::Button(int x, int y, int mw, int mh, const std::string &text)
 	: Component(x,y,mw,mh), caption(text)
 {
-
 }
 
 void Button::draw(int px, int py)
@@ -92,28 +142,44 @@ void Button::draw(int px, int py)
 	int nx = x + px;
 	int ny = y + py;
 
-	if (ui.hasFocus(this)) {
-		glColor3f(0, 0, 0);
-		fillRect(nx, ny, nx+w, ny+h);
+  bool focus = ui.hasFocus(this);
 
-		glColor3f(1, 1, 1);
+	if (focus) {
+    glColor3fv(ui_pressed);
 	} else {
-		glColor3f(1, 1, 1);
-		fillRect(nx, ny, nx+w, ny+h);
+    glColor3fv(ui_front);
+  }
 
-		glColor3f(0, 0, 0);
-	}
+  fillRect(nx, ny, nx+w, ny+h);
 
+  glColor3f(0, 0, 0);
 	glRasterPos2i(nx + 2, ny + 15);
 	glPrint("%s", caption.c_str());
 
-	glColor3f(0.3, 0.3, 0.3);
-	glBegin(GL_LINE_LOOP);
-		glVertex2i(nx,ny);
-		glVertex2i(nx+w,ny);
-		glVertex2i(nx+w,ny+h);
-		glVertex2i(nx-1,ny+h);
-	glEnd();
+  glBegin(GL_LINE_LOOP);
+    if (focus) {
+      glColor3fv(ui_border2);
+    } else {
+      glColor3fv(ui_border1);
+    }
+
+    glVertex2i(nx,ny);
+    glVertex2i(nx+w,ny);
+
+    if (focus) {
+      glColor3fv(ui_border1);
+    } else {
+      glColor3fv(ui_border2);
+    }
+
+    glVertex2i(nx+w,ny+h);
+    glVertex2i(nx,ny+h);
+  glEnd();
+}
+
+TextBox::TextBox(const std::string &text, int width)
+	: Component(0, 0, width, 20), text(text)
+{
 }
 
 TextBox::TextBox(int x, int y, int mw, int mh, const std::string &text)
@@ -190,7 +256,6 @@ void TextBox::draw(int px, int py)
 		glColor3f(0, 0, 0);
 		glRasterPos2i(nx + 2, ny + 15);
 		glPrint("%s", text.c_str());
-
 	}
 
 	glColor3f(0.7, 0.7, 0.7);
@@ -200,5 +265,4 @@ void TextBox::draw(int px, int py)
 		glVertex2i(nx+w,ny+h);
 		glVertex2i(nx-1,ny+h);
 	glEnd();
-
 }

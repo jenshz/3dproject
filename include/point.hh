@@ -1,30 +1,32 @@
 #ifndef _POINT_HH_
 #define _POINT_HH_
 
-// A represents a point in 2D space
-struct Point2D {
-  double x, y;
+struct Point2f {
+public:
+  float v[2];
 
-  Point2D() : x(0), y(0) {}
-  Point2D(double mx, double my) : x(mx), y(my) {}
-
-  Point2D& operator=(const Point2D &p) {
-    x = p.x;
-    y = p.y;
-
-	return *this;
+  Point2f() {
+    v[0] = 0; v[1] = 0; v[2] = 0;
   }
 
-  Point2D operator+(const Point2D &p) {
-    return Point2D(x + p.x, y + p.y);
+  Point2f(float x, float y) {
+    v[0] = x;
+    v[1] = y;
+  }
+};
+
+struct Point3f {
+public:
+  float v[3];
+
+  Point3f() {
+    v[0] = 0; v[1] = 0; v[2] = 0;
   }
 
-  Point2D operator*(const double m) {
-    return Point2D(x * m, y * m);
-  }
-
-  Point2D operator/(const double m) {
-    return Point2D(x / m, y / m);
+  Point3f(float x, float y, float z) {
+    v[0] = x;
+    v[1] = y;
+    v[2] = z;
   }
 };
 
