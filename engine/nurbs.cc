@@ -1,4 +1,5 @@
 #include "gl.hh"
+#include "point.hh"
 #include "nurbs.hh"
 
 #include <iostream>

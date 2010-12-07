@@ -30,4 +30,27 @@ public:
   }
 };
 
+struct Point4f {
+public:
+  float v[4];
+
+  Point4f() {
+    v[0] = 0; v[1] = 0; v[2] = 0; v[3] = 0;
+  }
+
+  Point4f(float x, float y, float z, float t) {
+    v[0] = x;
+    v[1] = y;
+    v[2] = z;
+    v[3] = t;
+  }
+
+  Point4f(const Point3f &p) {
+    v[0] = p.v[0];
+    v[1] = p.v[1];
+    v[2] = p.v[2];
+    v[3] = 1;
+  }
+};
+
 #endif

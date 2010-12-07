@@ -31,7 +31,8 @@ void register_lua(int argc, char*argv[])
 
   module(lua)
   [
-    class_<Component>("Component"),
+    class_<Component>("Component")
+      .def_readwrite("visible", &Component::visible),
     class_<Container, Component>("Container")
       .def("layout", &Container::layout)
       .def("add", &Container::add),
@@ -83,7 +84,10 @@ void register_lua(int argc, char*argv[])
       .def_readwrite("y", &Button::y)
       .def_readwrite("onClick", &Button::onClick),
 
-	class_<TextBox, Component>("TextBox")
+    class_<ImageButton, Button>("ImageButton")
+      .def(constructor<Texture*,int,int>()),
+
+  	class_<TextBox, Component>("TextBox")
       .def(constructor<std::string, int>())
       .def(constructor<int,int,int,int,std::string>())
       .def_readwrite("text", &TextBox::text)
@@ -93,48 +97,62 @@ void register_lua(int argc, char*argv[])
       .def_readwrite("y", &TextBox::y)
       .def_readwrite("onKeyDown", &TextBox::onKeyDown),
 
-  class_<Point3f>("Point3f")
-    .def(constructor<>())
-    .def(constructor<float, float, float>()),
+    class_<Point3f>("Point3f")
+      .def(constructor<>())
+      .def(constructor<const Point3f&>())
+      .def(constructor<float, float, float>()),
 
-  class_<SceneObject>("SceneObject")
-    .def(constructor<int>())
-    .def_readwrite("pos", &SceneObject::pos)
-    .def_readwrite("color", &SceneObject::color)
-    .def_readwrite("scale", &SceneObject::scale)
-    .def_readwrite("onClick", &SceneObject::onClick)
-    .def_readwrite("id", &SceneObject::id)
-    .enum_("constants")
-    [
-      value("MQuad", 0),
-      value("MCube", 1),
-      value("MSphere", 2),
-      value("MObject", 3)
-     ],
-  def("createQuad", &SceneObject::createQuad),
+    class_<Point4f>("Point4f")
+      .def(constructor<>())
+      .def(constructor<float, float, float, float>()),
 
-  class_<Camera>("Camera")
-    .def_readwrite("rotX", &Camera::rotX)
-    .def_readwrite("rotY", &Camera::rotY),
+    class_<SceneObject>("SceneObject")
+      .def(constructor<int>())
+      .def_readwrite("pos", &SceneObject::pos)
+      .def_readwrite("color", &SceneObject::color)
+      .def_readwrite("scale", &SceneObject::scale)
+      .def_readwrite("texture", &SceneObject::texture)
+      .def_readwrite("textured", &SceneObject::textured)
+      .def_readwrite("onClick", &SceneObject::onClick)
+      .def_readwrite("id", &SceneObject::id)
+      .enum_("constants")
+      [
+        value("MQuad", 0),
+        value("MCube", 1),
+        value("MSphere", 2),
+        value("MObject", 3)
+      ],
 
-  class_<Scene>("Scene")
-    .def_readwrite("onDeselect", &Scene::onDeselect)	
-    .def("add", &Scene::add)
-    .def("getCamera", &Scene::getCamera)
-    .scope
-	  [
-      def("get", &Scene::get)
-  	],
+    def("createQuad", &SceneObject::createQuad),
 
-	class_<Screen>("Screen")
-	.scope
-	[
-	  def("getWidth", &Screen::getWidth),
-	  def("getHeight", &Screen::getHeight),
-	  def("setSize", &Screen::setSize),
-	  def("toggleFullScreen", &Screen::toggleFullScreen)
-	]
-  ];
+    class_<Camera>("Camera")
+      .def_readwrite("rotX", &Camera::rotX)
+      .def_readwrite("rotY", &Camera::rotY),
+
+    class_<Scene>("Scene")
+      .def_readwrite("onDeselect", &Scene::onDeselect)	
+      .def("add", &Scene::add)
+      .def("getCamera", &Scene::getCamera)
+      .scope
+	    [
+        def("get", &Scene::get)
+      ],
+
+    class_<Texture>("Texture")
+      .scope
+      [
+        def("loadTexture", &Texture::loadTexture)
+      ],
+
+    class_<Screen>("Screen")
+      .scope
+      [
+        def("getWidth", &Screen::getWidth),
+        def("getHeight", &Screen::getHeight),
+        def("setSize", &Screen::setSize),
+        def("toggleFullScreen", &Screen::toggleFullScreen)
+     ]
+   ];
 }
 
 void cleanup_lua()

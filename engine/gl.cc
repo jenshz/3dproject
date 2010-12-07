@@ -17,6 +17,7 @@ void initGL()
 {
 	glClearColor (0., 0., 0., 0.);
 	glShadeModel (GL_FLAT);
+  glEnable(GL_DEPTH_TEST);
 	platform_buildFont();
 	ui.init();
 }

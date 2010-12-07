@@ -3,10 +3,9 @@
 
 #include <vector>
 #include <iostream>
+#include "texture.hh"
 #include "lua.hh"
 #include "point.hh"
-
-class Texture;
 
 enum ObjectType {
   MQuad = 0,
@@ -19,10 +18,9 @@ enum ObjectType {
 class SceneObject {
 private:
   int type;
-  bool textured;
 public:
   SceneObject(int mtype)
-    : type(mtype), color(1,1,1), scale(1,1,1), textured(false), id(0) {}
+    : type(mtype), color(1,1,1,1), scale(1,1,1), textured(false), id(0) {}
   virtual ~SceneObject() {
     std::cerr << "~SceneObject()" << std::endl;
   }
@@ -34,13 +32,14 @@ public:
   std::vector<Point3f> vertices;
 
   Point3f pos;
-  Point3f color;
+  Point4f color;
   Point3f scale;
 
   int id;
   static SceneObject *createQuad();
 
   luabind::object onClick;
+  bool textured;
 };
 
 

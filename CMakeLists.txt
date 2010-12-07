@@ -15,5 +15,5 @@ add_subdirectory(ui)
 add_subdirectory(engine)
 
 add_executable(pipe main.cc)
-target_link_libraries(pipe GL GLU glut lua5.1 luabind engine ui)
+target_link_libraries(pipe GL GLU glut lua5.1 png luabind engine ui)
 

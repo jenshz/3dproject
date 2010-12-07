@@ -179,19 +179,66 @@ void Button::draw(int px, int py)
   glEnd();
 }
 
-TextBox::TextBox(const std::string &text, int width)
-	: Component(0, 0, width, 20), text(text)
+ImageButton::ImageButton(Texture *fg, int w, int h)
+  : Button("", w), tex(fg)
 {
+  this->h = h;
 }
 
-TextBox::TextBox(int x, int y, int mw, int mh, const std::string &text)
-	: Component(x, y, mw, mh), text(text)
+void ImageButton::draw(int px, int py)
 {
-}
+	int nx = x + px;
+	int ny = y + py;
 
-const std::string &TextBox::getText()
-{
-	return text;
+  bool focus = ui.hasFocus(this);
+
+	if (focus) {
+    glColor3fv(ui_pressed);
+	} else {
+    glColor3fv(ui_front);
+  }
+
+  fillRect(nx, ny, nx+w, ny+h);
+
+  glEnable(GL_TEXTURE_2D);
+  tex->use();
+  glEnable (GL_BLEND);
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  // Draw image
+  glBegin(GL_QUADS);
+    glTexCoord2f(0,1);
+    glVertex2i(nx, ny);
+    glTexCoord2f(1,1);
+    glVertex2i(nx+w, ny);
+    glTexCoord2f(1,0);
+    glVertex2i(nx+w, ny+h);
+    glTexCoord2f(0,0);
+    glVertex2i(nx, ny+h);
+  glEnd();
+
+  glDisable(GL_BLEND);
+  glDisable(GL_TEXTURE_2D);
+  
+  // Draw border
+  glBegin(GL_LINE_LOOP);
+    if (focus) {
+      glColor3fv(ui_border2);
+    } else {
+      glColor3fv(ui_border1);
+    }
+
+    glVertex2i(nx,ny);
+    glVertex2i(nx+w,ny);
+
+    if (focus) {
+      glColor3fv(ui_border1);
+    } else {
+      glColor3fv(ui_border2);
+    }
+
+    glVertex2i(nx+w,ny+h);
+    glVertex2i(nx,ny+h);
+  glEnd();
 }
 
 void ClickListener::click()
@@ -208,6 +255,21 @@ void ClickListener::click()
 void ClickListener::onMouseDown()
 {
 	ui.setFocus(dynamic_cast<Component*>(this));
+}
+
+TextBox::TextBox(const std::string &text, int width)
+	: Component(0, 0, width, 20), text(text)
+{
+}
+
+TextBox::TextBox(int x, int y, int mw, int mh, const std::string &text)
+	: Component(x, y, mw, mh), text(text)
+{
+}
+
+const std::string &TextBox::getText()
+{
+	return text;
 }
 
 void TextBox::gainFocus()

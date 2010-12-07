@@ -5,6 +5,8 @@ Scene scene;
 
 void Scene::draw(bool select)
 {
+  glEnable(GL_DEPTH_TEST);
+
   // Set camera position
   camera.look();
 
@@ -18,6 +20,8 @@ void Scene::draw(bool select)
   for (std::vector<SceneObject*>::iterator it = objects.begin(); it != objects.end(); it++) {
     (*it)->draw(select);
   }
+
+  glDisable(GL_DEPTH_TEST);
 }
 
 #define BUFSIZE 512
@@ -34,7 +38,6 @@ void Scene::select(int x, int y)
   (void) glRenderMode (GL_SELECT);
 
   glInitNames();
-  glPushName(0);
 
   glMatrixMode (GL_PROJECTION);
   glPushMatrix ();

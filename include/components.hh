@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "stdafx.h"
+#include "texture.hh"
 
 class Container;
 
@@ -110,6 +111,14 @@ public:
 	virtual void draw(int px, int py);
 
 	std::string caption;
+};
+
+class ImageButton : public Button {
+public:
+	ImageButton(Texture *fg, int w, int h);
+  virtual void draw(int px, int py);
+
+  Texture *tex;
 };
 
 

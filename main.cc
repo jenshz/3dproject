@@ -11,13 +11,24 @@
 
 static void test_main()
 {
-  /*  SceneObject *o = new SceneObject(MQuad);
+  /*
+  SceneObject *o = new SceneObject(MQuad);
   o->vertices.push_back(Point3f(-3.,  0,   3));
   o->vertices.push_back(Point3f( 3.,  0.,  3));
   o->vertices.push_back(Point3f( 3.,  0., -3));
   o->vertices.push_back(Point3f(-3.,  0., -3));
 
-  scene.objects.push_back(o); */
+  scene.objects.push_back(o);
+  Texture *tex = Texture::loadTexture("jens.png");
+
+  o->texcoords.push_back(Point2f(0, 1));
+  o->texcoords.push_back(Point2f(1, 1));
+  o->texcoords.push_back(Point2f(1, 0));
+  o->texcoords.push_back(Point2f(0, 0));
+
+  o->texture = tex;
+  o->textured = true;
+  */
 }
 	
 void glut_init(int argc, char*argv[])
