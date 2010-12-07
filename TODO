@@ -1,7 +1,5 @@
-
 Implementation:
-* Viewports (with lists of objects to be rendered)
-* Port to windows
+* Viewports (with lists of objects to be rendered) - only one viewport is supported now
 * Option to reload the UI init file
 
 
@@ -11,19 +9,12 @@ Data:
  - Text loader
 
 
-
 Layout:
-* Nested layout (containers with objects)
 * Anchors
-* Vertical and horizontal layouts (panels)
-
-
 
 
 Implement other UI components:
-* Button
 * Checkbox
-* Textbox  (text field)
 * Scrollable field for displaying text and log output
 * Slider
 * Arrows and lines
@@ -43,5 +34,4 @@ Visual:
 Misc.:
 * Load layout from XML files
 * Give windows ids
-* Ensure loading of fonts works on windows
 
