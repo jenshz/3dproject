@@ -9,11 +9,6 @@
 #include "gl.hh"
 #include "engine.hh"
 
-void myExit()
-{
-  cleanup_lua();
-}
-
 static void test_main()
 {
   /*  SceneObject *o = new SceneObject(MQuad);
@@ -39,7 +34,7 @@ void glut_init(int argc, char*argv[])
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
   glutKeyboardFunc(keyboard);
-
+ 
   initGL();
 
   test_main();
@@ -52,10 +47,9 @@ int main(int argc, char *argv[])
 {
   register_lua(argc, argv);
  
-  atexit(myExit);
-
   glut_init(argc, argv);
 
+  cleanup_lua();
   return 0;
 }
 

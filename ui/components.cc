@@ -17,7 +17,9 @@ static const float ui_border1[] = { 1.0, 1.0, 1.0 };
 static const float ui_border2[] = { 0.2, 0.2, 0.2 };
 
 Component::~Component() {
-  std::cerr << "DEBUG: " << this << " destroyed" << std::endl;
+  if(!System::exiting) {
+    std::cerr << "DEBUG: " << this << " destroyed" << std::endl;
+  }
 }
 
 void Container::add(Component *comp)

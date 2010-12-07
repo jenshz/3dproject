@@ -14,15 +14,8 @@
 #include <stdlib.h>
 
 
-class System {
-public:
-	static void exit(int errorCode) {
-		::exit(errorCode);
-	}
-
-	static void print(const std::string &what) {
-		std::cout << what << std::endl;
-	}
+namespace System {
+  bool exiting = false;
 };
 
 lua_State *lua;
@@ -140,15 +133,7 @@ void register_lua(int argc, char*argv[])
 	  def("getHeight", &Screen::getHeight),
 	  def("setSize", &Screen::setSize),
 	  def("toggleFullScreen", &Screen::toggleFullScreen)
-	],
-
-	class_<System>("System")
-	.scope
-	[
-	  def("print", &System::print),
-	  def("exit", &System::exit)
 	]
-
   ];
 }
 

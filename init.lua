@@ -6,7 +6,7 @@ main_win.draggable = false
 
 close_but = Button("Quit", 100)
 close_but.onClick = function(self)
-  System.exit(0)
+  os.exit()
 end
 
 windows[main_win] = true

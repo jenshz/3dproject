@@ -108,6 +108,8 @@ bool Scene::motion(int x, int y)
     dy = y;
     glutPostRedisplay();
   }
+
+  return false;
 }
 
 bool Scene::mouseDown(int button, int x, int y)
@@ -120,11 +122,14 @@ bool Scene::mouseDown(int button, int x, int y)
     select(x,y);
     glutPostRedisplay();
   }
+
+  return false;
 }
 
 bool Scene::mouseUp(int button, int x, int y)
 {
   down = false;
+  return false;
 }
 
 void Scene::add(SceneObject *obj)

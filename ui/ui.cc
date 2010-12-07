@@ -105,6 +105,8 @@ bool UI::motion(int x, int y)
   } else {
     return false;
   }
+
+  return false;
 }
 
 
@@ -153,6 +155,7 @@ bool UI::mouseUp(int button, int x, int y)
 			glutPostRedisplay();
 		}
 	}
+  return false;
 }
 
 

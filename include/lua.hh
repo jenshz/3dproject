@@ -3,6 +3,10 @@
 
 #include "stdafx.h"
 
+namespace System {
+  extern bool exiting;
+}
+
 extern lua_State *lua;
 
 void register_lua(int argc, char*argv[]);

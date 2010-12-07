@@ -25,13 +25,15 @@ void initGL()
 void reshape (int w, int h)
 {
 	glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-  
+
+  app::width = w;
+  app::height = h;
+
 	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);
 
   ui.reshape(w, h);
-  app::width = w;
-  app::height = h;
 }
 
 void display (void) {
